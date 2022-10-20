@@ -10,7 +10,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model House {
-  id   String @id @default(uuid())
-  name String
+model Place {
+  id        String      @id @default(uuid())
+  name      String
+  UserPlace UserPlace[]
+}
+
+model User {
+  id        String      @id @default(uuid())
+  name      String
+  email     String
+  password  String
+  UserPlace UserPlace[]
+}
+
+model UserPlace {
+  Userid  String
+  Placeid String
+
+  user  User  @relation(fields: [Userid], references: [id])
+  place Place @relation(fields: [Placeid], references: [id])
+
+  @@id([Userid, Placeid])
 }
