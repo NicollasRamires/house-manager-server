@@ -39,8 +39,8 @@ app.post('/place', async (request, response) => {
 
     await prisma.userPlace.create({
         data:{
-            Userid: body.userId,
-            Placeid: place.id
+            userId: body.userId,
+            placeId: place.id
         }
     })
 
@@ -52,12 +52,37 @@ app.post('/place/join', async (request, response) => {
 
     const UserPlace = await prisma.userPlace.create({
         data:{
-            Userid: body.userId,
-            Placeid: body.placeId
+            userId: body.userId,
+            placeId: body.placeId
         }
     })
 
     return response.status(201).json(UserPlace);
+});
+
+app.get('/user/:id/places', async (request, response) => {
+    const idUser: string = request.params.id;
+
+    const UserPlaces = await prisma.place.findMany({
+       include:{
+            _count: {
+                select: {
+                    users: true
+                }
+            }
+        }, 
+        where:{ 
+            users: {
+                some: {
+                    userId: {
+                        equals: idUser
+                    }
+                }
+            }
+        },
+    })
+
+    return response.status(200).json(UserPlaces);
 });
 
 app.listen(5556)
